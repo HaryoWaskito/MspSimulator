@@ -1,0 +1,132 @@
+@page "{connectionId:int?}"
+@model DashboardModel
+@{
+    ViewData["Title"] = "OCPI Dashboard";
+}
+
+<h1>OCPI Simulator Dashboard</h1>
+
+@if (Model.Connection == null)
+{
+    <p style="color: red;">No OCPI connection found. Create one in the database.</p>
+}
+else
+{
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Connection State</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>CPO Party ID:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.CpoPartyId</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>CPO Country Code:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.CpoCountryCode</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Base URL:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.BaseUrl</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Status:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.Status</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Active:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@(Model.Connection.IsActive ? "Yes" : "No")</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Handshake Mode:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@(Model.Connection.HandshakeMode == 0 ? "EMSP-Initiated" : "CPO-Initiated")</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Tokens</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>OCPI Token (from CPO):</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;"><code>@Model.MaskToken(Model.Connection.OcpiToken)</code></td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Client Token (to CPO):</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;"><code>@Model.MaskToken(Model.Connection.ClientToken)</code></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Handshake Progress</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>Created At:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.CreatedAt:O</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Updated At:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@(Model.Connection.UpdatedAt?.ToString("O") ?? "Never")</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Last Exchange:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@(Model.LastExchangeTime?.ToString("O") ?? "No exchanges yet")</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Total Exchanges:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.CredentialLogsCount</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ffeaa7; background-color: #fffacd;">
+        <h2>Error Simulation Control</h2>
+        <form method="post" asp-page-handler="UpdateErrorSimulation" asp-route-connectionId="@(RouteData.Values["connectionId"] ?? 1)">
+            <fieldset style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px;">
+                <legend>Versions Endpoint (GET /ocpi/versions)</legend>
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="checkbox" name="SimulateVersionsUnauthorized" value="true" @(Model.SimulateVersionsUnauthorized ? "checked" : "") />
+                        Simulate 401 Unauthorized
+                    </label>
+                </div>
+
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="checkbox" name="SimulateVersionsForbidden" value="true" @(Model.SimulateVersionsForbidden ? "checked" : "") />
+                        Simulate 403 Forbidden
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px;">
+                <legend>Credentials Endpoint (POST/DELETE /ocpi/2.3.0/credentials)</legend>
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="checkbox" name="SimulateCredentialsUnauthorized" value="true" @(Model.SimulateCredentialsUnauthorized ? "checked" : "") />
+                        Simulate 401 Unauthorized
+                    </label>
+                </div>
+
+                <div style="margin: 10px 0;">
+                    <label>
+                        <input type="checkbox" name="SimulateCredentialsForbidden" value="true" @(Model.SimulateCredentialsForbidden ? "checked" : "") />
+                        Simulate 403 Forbidden
+                    </label>
+                </div>
+            </fieldset>
+
+            <div style="margin: 15px 0;">
+                <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; cursor: pointer;">
+                    Update Error Flags
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Quick Commands</h2>
+        <p>
+            <a href="@Url.Page("/Logs", new { connectionId = Model.Connection.Id })" style="display: inline-block; margin: 5px; padding: 8px 16px; background-color: #28a745; color: white; text-decoration: none;">View Exchange Logs</a>
+        </p>
+    </div>
+}

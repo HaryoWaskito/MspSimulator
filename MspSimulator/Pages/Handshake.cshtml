@@ -1,0 +1,167 @@
+@page "{connectionId:int?}"
+@model HandshakeModel
+@{
+    ViewData["Title"] = "OCPI Handshake Control";
+}
+
+<h1>OCPI Handshake Control</h1>
+
+@if (Model.Connection == null)
+{
+    <p style="color: red;">No OCPI connection found. Create one in the database.</p>
+}
+else
+{
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Connection Information</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; width: 30%;"><strong>CPO Party ID:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.CpoPartyId / @Model.Connection.CpoCountryCode</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Base URL:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@Model.Connection.BaseUrl</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Current Status:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    <strong style="color: @GetStatusColor(Model.Connection.Status);">@Model.Connection.Status</strong>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>OCPI Token:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                    @if (string.IsNullOrEmpty(Model.Connection.OcpiToken))
+                    {
+                        <span style="color: #666;">(not set)</span>
+                    }
+                    else
+                    {
+                        <code>@MaskToken(Model.Connection.OcpiToken)</code>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Last Updated:</strong></td>
+                <td style="padding: 8px; border: 1px solid #ddd;">@(Model.Connection.UpdatedAt?.ToString("g") ?? "Never")</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #e0e0e0; background-color: #fff8f0;">
+        <h2>Handshake Actions</h2>
+        
+        <form method="post" asp-page-handler="InitiateHandshake" asp-route-connectionId="@(Model.Connection.Id)" style="display: inline;">
+            <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; margin-right: 10px; font-size: 14px;">
+                ? Initiate EMSP Handshake
+            </button>
+        </form>
+
+        <form method="post" asp-page-handler="Revoke" asp-route-connectionId="@(Model.Connection.Id)" style="display: inline;">
+            <button type="submit" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer; font-size: 14px;" 
+                    @(string.IsNullOrEmpty(Model.Connection.OcpiToken) ? "disabled" : "")>
+                ? Revoke Credentials
+            </button>
+        </form>
+
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">
+            <strong>EMSP-Initiated:</strong> Retrieves CPO versions, then sends EMSP credentials to CPO's credentials endpoint.
+        </p>
+    </div>
+
+    @if (Model.ShowResult && Model.LastResult != null)
+    {
+        <div style="margin: 20px 0; padding: 15px; border: 2px solid @(Model.LastResult.Success ? "#28a745" : "#dc3545"); background-color: @(Model.LastResult.Success ? "#f1f8f4" : "#fdf5f5");">
+            <h2 style="color: @(Model.LastResult.Success ? "#28a745" : "#dc3545");">
+                @(Model.LastResult.Success ? "? Success" : "? Failed")
+            </h2>
+
+            <p style="font-size: 16px; margin: 10px 0;">
+                <strong>Result:</strong> @Model.LastResult.Message
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model.LastResult.Status))
+            {
+                <p style="margin: 10px 0;">
+                    <strong>New Status:</strong> <code>@Model.LastResult.Status</code>
+                </p>
+            }
+
+            <div style="margin: 15px 0; padding: 10px; background-color: #f5f5f5; border-left: 3px solid #007bff;">
+                <strong>Steps Executed:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    @foreach (var step in Model.LastResult.Steps)
+                    {
+                        <li style="margin: 5px 0; font-family: monospace; font-size: 13px;">@step</li>
+                    }
+                </ul>
+            </div>
+
+            @if (Model.LastResult.Errors.Count > 0)
+            {
+                <div style="margin: 15px 0; padding: 10px; background-color: #ffe6e6; border-left: 3px solid #dc3545;">
+                    <strong style="color: #dc3545;">Errors:</strong>
+                    <ul style="margin: 10px 0; padding-left: 20px; color: #c82333;">
+                        @foreach (var error in Model.LastResult.Errors)
+                        {
+                            <li style="margin: 5px 0; font-family: monospace; font-size: 13px;">@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    }
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>State Machine</h2>
+        <p style="font-family: monospace; font-size: 12px;">
+            None ? VersionsExchanged ? Connected ? Revoked
+        </p>
+        <p style="font-size: 12px; color: #666;">
+            <strong>None:</strong> Initial state, no handshake started<br>
+            <strong>VersionsExchanged:</strong> Successfully retrieved CPO versions<br>
+            <strong>Connected:</strong> Credentials exchanged, ready for OCPI operations<br>
+            <strong>Revoked:</strong> Credentials revoked, connection inactive<br>
+            <strong>HandshakeFailed:</strong> Handshake attempt failed
+        </p>
+    </div>
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Navigation</h2>
+        <p>
+            <a href="@Url.Page("/Dashboard", new { connectionId = Model.Connection.Id })" style="display: inline-block; margin: 5px; padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none;">
+                ? Dashboard
+            </a>
+            <a href="@Url.Page("/Logs", new { connectionId = Model.Connection.Id })" style="display: inline-block; margin: 5px; padding: 8px 16px; background-color: #6c757d; color: white; text-decoration: none;">
+                View Logs
+            </a>
+        </p>
+    </div>
+}
+
+@functions {
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "None" => "#666",
+            "VersionsExchanged" => "#ff9800",
+            "Connected" => "#28a745",
+            "Revoked" => "#dc3545",
+            "HandshakeFailed" => "#dc3545",
+            _ => "#666"
+        };
+    }
+
+    private string MaskToken(string? token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return "(not set)";
+
+        if (token.Length <= 8)
+            return "***";
+
+        return token.Substring(0, 4) + "***" + token.Substring(token.Length - 4);
+    }
+}

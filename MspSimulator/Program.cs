@@ -14,6 +14,7 @@ builder.Services.AddDbContext<OcpiDbContext>(options =>
 builder.Services.AddScoped<IOcpiVersionsService, OcpiVersionsService>();
 builder.Services.AddScoped<IOcpiCredentialsService, OcpiCredentialsService>();
 builder.Services.AddScoped<IOcpiHandshakeService, OcpiHandshakeService>();
+builder.Services.AddScoped<IOcpiErrorSimulationService, OcpiErrorSimulationService>();
 
 // Register OCPI HTTP client
 builder.Services.AddHttpClient<IOcpiHttpClient, OcpiHttpClient>()

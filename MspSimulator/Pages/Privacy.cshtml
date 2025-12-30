@@ -5,4 +5,176 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div style="margin: 20px 0; line-height: 1.6; color: #333;">
+    <h2>OCPI EMSP Simulator - Privacy Policy</h2>
+
+    <h3>1. Overview</h3>
+    <p>
+        The OCPI EMSP Simulator ("Application") is a development and testing tool designed to simulate 
+        Electric Mobility Service Provider (EMSP) behavior for OCPI (Open Charge Point Interface) 2.3 
+        protocol testing and integration development.
+    </p>
+
+    <h3>2. Data Collection and Processing</h3>
+    <p>
+        <strong>Local Data Storage Only:</strong>
+    </p>
+    <ul>
+        <li>All data is stored locally in SQLite database</li>
+        <li>No data is transmitted to external servers or cloud services</li>
+        <li>No telemetry, tracking, or analytics are collected</li>
+        <li>No personal information is collected or processed</li>
+    </ul>
+
+    <h3>3. Data Types Stored Locally</h3>
+    <p>
+        The Application may store the following technical data for OCPI protocol simulation:
+    </p>
+    <ul>
+        <li>CPO (Charge Point Operator) connection configuration and credentials</li>
+        <li>OCPI authentication tokens for handshake testing</li>
+        <li>Raw OCPI protocol payloads (request/response messages)</li>
+        <li>Credential exchange logs and audit trails</li>
+        <li>Error simulation flags for testing error scenarios</li>
+        <li>Timestamps of OCPI transactions</li>
+    </ul>
+
+    <h3>4. Data Scope</h3>
+    <p>
+        This data is intended to be:
+    </p>
+    <ul>
+        <li><strong>Test Data Only:</strong> Not representative of real users or transactions</li>
+        <li><strong>Development-Use:</strong> For protocol testing and integration verification</li>
+        <li><strong>Non-Production:</strong> Should not be used with live production systems</li>
+        <li><strong>Isolated:</strong> Never shared with third parties</li>
+    </ul>
+
+    <h3>5. User Access and Control</h3>
+    <p>
+        Users have full control over all stored data:
+    </p>
+    <ul>
+        <li>Direct access to SQLite database</li>
+        <li>Ability to delete or modify all records</li>
+        <li>Option to reset error simulation flags at any time</li>
+        <li>View complete audit trail of all operations</li>
+    </ul>
+
+    <h3>6. Security Considerations</h3>
+    <p>
+        <strong>Important:</strong> This is a development tool and is NOT intended for production use.
+    </p>
+    <ul>
+        <li>No encryption of stored data (SQLite default)</li>
+        <li>No authentication on internal UI endpoints</li>
+        <li>No authorization controls on data access</li>
+        <li>Should only be deployed in isolated development environments</li>
+    </ul>
+
+    <h3>7. OCPI Token Handling</h3>
+    <p>
+        Tokens used for OCPI protocol testing:
+    </p>
+    <ul>
+        <li>Are stored in plain text in local SQLite database</li>
+        <li>Are masked in UI display (first 4 and last 4 characters only)</li>
+        <li>Should be test tokens only, never production credentials</li>
+        <li>Can be revoked and cleared via the Handshake page</li>
+    </ul>
+
+    <h3>8. Payload Storage</h3>
+    <p>
+        Raw OCPI payloads are stored verbatim for protocol compliance testing:
+    </p>
+    <ul>
+        <li>Request and response bodies captured in full</li>
+        <li>Stored as plain text JSON</li>
+        <li>Used for debugging and interoperability verification</li>
+        <li>Can be inspected via the Logs page</li>
+    </ul>
+
+    <h3>9. Data Retention</h3>
+    <p>
+        Data is retained indefinitely until:
+    </p>
+    <ul>
+        <li>User manually deletes database records</li>
+        <li>User deletes the SQLite database file</li>
+        <li>Application instance is reset</li>
+    </ul>
+
+    <h3>10. Third-Party Services</h3>
+    <p>
+        <strong>No Third-Party Data Sharing:</strong>
+    </p>
+    <ul>
+        <li>The Application does not use external APIs or cloud services for core functionality</li>
+        <li>External CPO connections are initiated by the user (outbound calls only)</li>
+        <li>User is responsible for compliance with external CPO privacy policies</li>
+    </ul>
+
+    <h3>11. Error Simulation and Testing</h3>
+    <p>
+        The Application includes deterministic error simulation for testing purposes:
+    </p>
+    <ul>
+        <li>Simulated 401 Unauthorized and 403 Forbidden errors</li>
+        <li>Flags are persisted to database</li>
+        <li>Used for testing error handling in client applications</li>
+        <li>Errors are completely controllable and reversible</li>
+    </ul>
+
+    <h3>12. User Responsibilities</h3>
+    <p>
+        Users are responsible for:
+    </p>
+    <ul>
+        <li>Using the Application only in development/test environments</li>
+        <li>Not connecting to production CPO systems without explicit permission</li>
+        <li>Keeping test credentials separate from production credentials</li>
+        <li>Ensuring compliance with OCPI specification requirements</li>
+        <li>Protecting the database file in case it contains sensitive test data</li>
+    </ul>
+
+    <h3>13. Compliance Notes</h3>
+    <p>
+        <strong>GDPR/Privacy Regulations:</strong>
+    </p>
+    <ul>
+        <li>This Application does not process personal data by design</li>
+        <li>Test tokens and configurations should not contain personal information</li>
+        <li>If personal data is included, users are responsible for compliance</li>
+        <li>The Application itself makes no external data transmissions</li>
+    </ul>
+
+    <h3>14. Open Source Information</h3>
+    <p>
+        This Application is open-source software available on GitHub:
+    </p>
+    <ul>
+        <li>Source code is publicly available for inspection</li>
+        <li>No hidden data collection mechanisms</li>
+        <li>Community-driven development</li>
+    </ul>
+
+    <h3>15. Changes to Privacy Policy</h3>
+    <p>
+        This privacy policy may be updated to reflect changes in the Application. 
+        Users will be notified of significant changes.
+    </p>
+
+    <h3>16. Contact and Support</h3>
+    <p>
+        For questions about this privacy policy or the Application, please refer to the 
+        project documentation and issue tracker on GitHub.
+    </p>
+
+    <div style="margin-top: 30px; padding: 15px; border-left: 4px solid #007bff; background-color: #e7f3ff;">
+        <p style="margin: 0;">
+            <strong>Summary:</strong> The OCPI EMSP Simulator is a local development tool that stores all data 
+            locally in SQLite with no external data transmission. It is designed for protocol testing and 
+            integration development only, and should not be used with production systems or real user data.
+        </p>
+    </div>
+</div>

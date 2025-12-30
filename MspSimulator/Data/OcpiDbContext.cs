@@ -14,12 +14,15 @@ public class OcpiDbContext : DbContext
 
     public DbSet<CredentialExchangeLog> CredentialExchangeLogs { get; set; } = null!;
 
+    public DbSet<OcpiErrorSimulation> ErrorSimulations { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         ConfigureOcpiConnection(modelBuilder);
         ConfigureCredentialExchangeLog(modelBuilder);
+        ConfigureErrorSimulation(modelBuilder);
     }
 
     private static void ConfigureOcpiConnection(ModelBuilder modelBuilder)
@@ -135,6 +138,33 @@ public class OcpiDbContext : DbContext
             entity.Property(e => e.Timestamp)
                 .IsRequired()
                 .HasDefaultValueSql("datetime('now')");
+        });
+    }
+
+    private static void ConfigureErrorSimulation(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<OcpiErrorSimulation>(entity =>
+        {
+            entity.ToTable("OcpiErrorSimulations");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.ForceUnauthorized)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            entity.Property(e => e.ForceForbidden)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("datetime('now')");
+
+            entity.Property(e => e.UpdatedAt);
         });
     }
 }

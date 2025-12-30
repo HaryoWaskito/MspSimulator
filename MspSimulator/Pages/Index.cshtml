@@ -1,10 +1,196 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "OCPI EMSP Simulator";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 2.5em; margin: 20px 0; color: #007bff;">OCPI EMSP Simulator</h1>
+        <p style="font-size: 1.2em; color: #666; margin: 10px 0;">
+            Open Charge Point Interface 2.3 - Electric Mobility Service Provider Test Platform
+        </p>
+        <p style="color: #999; font-size: 0.95em;">
+            Development tool for testing OCPI handshake flows and credential exchange protocols
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;">
+        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+            <h2 style="color: #007bff; margin-top: 0;">🚀 Quick Start</h2>
+            <ol style="line-height: 1.8;">
+                <li>Navigate to <strong>Dashboard</strong> to view connection state</li>
+                <li>Go to <strong>Handshake Control</strong> to initiate EMSP handshake</li>
+                <li>View <strong>Exchange Logs</strong> to inspect raw payloads</li>
+                <li>Use <strong>Error Simulation API</strong> to test error scenarios</li>
+            </ol>
+            <p style="margin-top: 20px;">
+                <a href="/Dashboard" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">
+                    → Go to Dashboard
+                </a>
+            </p>
+        </div>
+
+        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+            <h2 style="color: #28a745; margin-top: 0;">📋 What is OCPI?</h2>
+            <p>
+                <strong>OCPI 2.3</strong> is the Open Charge Point Interface protocol enabling 
+                interoperability between Electric Vehicle Charge Point Operators (CPOs) and 
+                Electric Mobility Service Providers (EMSPs).
+            </p>
+            <p style="margin: 0; color: #666; font-size: 0.9em;">
+                This simulator implements the EMSP role for testing credential handshakes and version negotiation.
+            </p>
+        </div>
+    </div>
+
+    <div style="padding: 20px; border-left: 4px solid #ffc107; background-color: #fffacd; margin-bottom: 40px; border-radius: 3px;">
+        <h3 style="margin-top: 0; color: #ff9800;">⚠️ Important</h3>
+        <p style="margin: 0;">
+            This is a <strong>development and testing tool only</strong>. It should never be used with production 
+            credentials or connected to live CPO systems without explicit testing authorization.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f0f8ff;">
+            <h3 style="color: #007bff; margin-top: 0;">📊 Dashboard</h3>
+            <p style="font-size: 0.95em; line-height: 1.6;">
+                View current OCPI connection state, tokens, handshake status, and configure error simulation flags.
+            </p>
+            <p style="margin: 0;">
+                <a href="/Dashboard" style="color: #007bff; text-decoration: none;">View Dashboard →</a>
+            </p>
+        </div>
+
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f0fff4;">
+            <h3 style="color: #28a745; margin-top: 0;">🤝 Handshake</h3>
+            <p style="font-size: 0.95em; line-height: 1.6;">
+                Initiate EMSP-initiated handshake with CPO or revoke credentials. Watch step-by-step progress.
+            </p>
+            <p style="margin: 0;">
+                <a href="/Handshake" style="color: #28a745; text-decoration: none;">Control Handshake →</a>
+            </p>
+        </div>
+
+        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #ffe6e6;">
+            <h3 style="color: #dc3545; margin-top: 0;">📝 Logs</h3>
+            <p style="font-size: 0.95em; line-height: 1.6;">
+                Inspect complete audit trail of credential exchanges with raw request/response payloads.
+            </p>
+            <p style="margin: 0;">
+                <a href="/Logs" style="color: #dc3545; text-decoration: none;">View Logs →</a>
+            </p>
+        </div>
+    </div>
+
+    <div style="background-color: #f9f9f9; padding: 25px; border-radius: 5px; margin-bottom: 40px;">
+        <h2 style="color: #333; margin-top: 0;">🔧 Features</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h4 style="color: #007bff;">OCPI Protocol Support</h4>
+                <ul style="font-size: 0.95em; line-height: 1.8;">
+                    <li>✓ Versions module (GET /ocpi/versions)</li>
+                    <li>✓ Credentials module (POST/DELETE /ocpi/2.3/credentials)</li>
+                    <li>✓ Dual handshake modes (EMSP-initiated, CPO-initiated)</li>
+                    <li>✓ Complete token exchange flow</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #28a745;">Testing & Debugging</h4>
+                <ul style="font-size: 0.95em; line-height: 1.8;">
+                    <li>✓ Deterministic error simulation (401, 403)</li>
+                    <li>✓ Raw payload inspection</li>
+                    <li>✓ Complete audit trail</li>
+                    <li>✓ Internal control API endpoints</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="background-color: #e7f3ff; padding: 25px; border-radius: 5px; border-left: 4px solid #007bff; margin-bottom: 40px;">
+        <h2 style="color: #007bff; margin-top: 0;">📚 API Endpoints</h2>
+        <p style="font-size: 0.9em; margin-bottom: 15px;">Public OCPI endpoints (called by CPO):</p>
+        <div style="background-color: white; padding: 15px; border-radius: 3px; margin-bottom: 15px; font-family: monospace; font-size: 0.9em;">
+            <div style="margin: 8px 0;">GET <strong>/ocpi/versions</strong> - Discover OCPI version endpoints</div>
+            <div style="margin: 8px 0;">POST <strong>/ocpi/2.3/credentials</strong> - Receive CPO credentials</div>
+            <div style="margin: 8px 0;">DELETE <strong>/ocpi/2.3/credentials</strong> - Revoke connection</div>
+        </div>
+        <p style="font-size: 0.9em; margin-bottom: 15px;">Internal control API (admin only):</p>
+        <div style="background-color: white; padding: 15px; border-radius: 3px; font-family: monospace; font-size: 0.9em;">
+            <div style="margin: 8px 0;">POST <strong>/ui/error/401?enable=true</strong> - Force 401 errors</div>
+            <div style="margin: 8px 0;">POST <strong>/ui/error/403?enable=true</strong> - Force 403 errors</div>
+            <div style="margin: 8px 0;">GET <strong>/ui/error/status</strong> - Check error status</div>
+            <div style="margin: 8px 0;">POST <strong>/ui/error/reset</strong> - Reset to normal</div>
+        </div>
+    </div>
+
+    <div style="background-color: #fffacd; padding: 25px; border-radius: 5px; border-left: 4px solid #ffc107; margin-bottom: 40px;">
+        <h2 style="color: #ff9800; margin-top: 0;">💾 Data Storage</h2>
+        <ul style="font-size: 0.95em; line-height: 2;">
+            <li><strong>Database:</strong> SQLite (MspSimulator.db)</li>
+            <li><strong>Tokens:</strong> Persisted across restarts</li>
+            <li><strong>Payloads:</strong> Raw OCPI JSON stored verbatim</li>
+            <li><strong>Logs:</strong> Complete audit trail of all exchanges</li>
+            <li><strong>No External:</strong> All data stays local, no cloud transmission</li>
+        </ul>
+    </div>
+
+    <div style="background-color: #f0fff4; padding: 25px; border-radius: 5px; border-left: 4px solid #28a745; margin-bottom: 40px;">
+        <h2 style="color: #28a745; margin-top: 0;">🔍 Debugging Workflow</h2>
+        <ol style="font-size: 0.95em; line-height: 2;">
+            <li><strong>Check Dashboard</strong> - View connection state and error flags</li>
+            <li><strong>Trigger Handshake</strong> - Initiate OCPI exchange in Handshake page</li>
+            <li><strong>View Progress</strong> - Watch step-by-step execution and status</li>
+            <li><strong>Inspect Logs</strong> - Examine raw request/response payloads</li>
+            <li><strong>Simulate Errors</strong> - Use error API to test error handling</li>
+            <li><strong>Verify Recovery</strong> - Confirm client handles errors correctly</li>
+        </ol>
+    </div>
+
+    <div style="background-color: #fff3cd; padding: 25px; border-radius: 5px; border-left: 4px solid #ff9800; margin-bottom: 40px;">
+        <h2 style="color: #ff9800; margin-top: 0;">⚙️ Configuration</h2>
+        <p style="font-size: 0.95em; margin-bottom: 15px;">
+            <strong>CPO Connection:</strong> Edit the OcpiConnections table in SQLite database:
+        </p>
+        <div style="background-color: white; padding: 15px; border-radius: 3px; font-family: monospace; font-size: 0.85em; overflow-x: auto;">
+            <div style="margin: 5px 0;">INSERT INTO OcpiConnections (CpoPartyId, CpoCountryCode, BaseUrl, ...)</div>
+            <div style="margin: 5px 0;">VALUES ('ABC', 'NL', 'https://cpo.example.com/ocpi', ...);</div>
+        </div>
+        <p style="font-size: 0.9em; margin-top: 15px; color: #666;">
+            Configure CPO party ID, country code, base URL, and handshake mode in the database.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;">
+        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f0f8ff;">
+            <h3 style="color: #007bff; margin-top: 0;">📖 Documentation</h3>
+            <ul style="font-size: 0.95em; line-height: 1.8;">
+                <li><a href="https://github.com/HaryoWaskito/MspSimulator" style="color: #007bff;">GitHub Repository</a></li>
+                <li><a href="/Privacy" style="color: #007bff;">Privacy Policy</a></li>
+                <li>See <code>*.md</code> files in project root for detailed docs</li>
+            </ul>
+        </div>
+
+        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f0fff4;">
+            <h3 style="color: #28a745; margin-top: 0;">🔗 OCPI Resources</h3>
+            <ul style="font-size: 0.95em; line-height: 1.8;">
+                <li><a href="https://evroaming.org/ocpi/" style="color: #28a745;">OCPI Specification</a></li>
+                <li><a href="https://github.com/ocpi/ocpi" style="color: #28a745;">OCPI GitHub</a></li>
+                <li><a href="https://evroaming.org/" style="color: #28a745;">EV Roaming Foundation</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 30px; border-top: 2px solid #ddd; color: #666; font-size: 0.9em;">
+        <p style="margin: 10px 0;">
+            <strong>OCPI EMSP Simulator</strong> - Development Tool for OCPI 2.3 Protocol Testing
+        </p>
+        <p style="margin: 10px 0;">
+            Built with ASP.NET Core (.NET 10), Razor Pages, and SQLite
+        </p>
+        <p style="margin: 0; color: #999;">
+            © 2024 - Open Source | <a href="/Privacy" style="color: #999;">Privacy Policy</a>
+        </p>
+    </div>
 </div>

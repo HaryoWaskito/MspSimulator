@@ -51,7 +51,7 @@ else
 
     <div style="margin: 20px 0; padding: 15px; border: 1px solid #e0e0e0; background-color: #fff8f0;">
         <h2>Handshake Actions</h2>
-        
+
         <form method="post" asp-page-handler="InitiateHandshake" asp-route-connectionId="@(Model.Connection.Id)" style="display: inline;">
             <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; margin-right: 10px; font-size: 14px;">
                 ? Initiate EMSP Handshake
@@ -59,7 +59,7 @@ else
         </form>
 
         <form method="post" asp-page-handler="Revoke" asp-route-connectionId="@(Model.Connection.Id)" style="display: inline;">
-            <button type="submit" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer; font-size: 14px;" 
+            <button type="submit" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer; font-size: 14px;"
                     @(string.IsNullOrEmpty(Model.Connection.OcpiToken) ? "disabled" : "")>
                 ? Revoke Credentials
             </button>

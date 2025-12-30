@@ -1,0 +1,159 @@
+@page "{connectionId:int?}"
+@model LogsModel
+@{
+    ViewData["Title"] = "OCPI Exchange Logs";
+}
+
+<h1>OCPI Credential Exchange Logs</h1>
+
+@if (Model.Connection == null)
+{
+    <p style="color: red;">No OCPI connection found.</p>
+}
+else
+{
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Connection</h2>
+        <p>
+            <strong>@Model.Connection.CpoPartyId / @Model.Connection.CpoCountryCode</strong>
+            <br>
+            @Model.Connection.BaseUrl
+        </p>
+    </div>
+
+    @if (Model.ExchangeLogs.Count == 0)
+    {
+        <div style="margin: 20px 0; padding: 15px; border: 1px solid #ffc107; background-color: #fffacd;">
+            <p>No credential exchange logs found for this connection.</p>
+        </div>
+    }
+    else
+    {
+        <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+            <h2>Exchange Log Entries (@Model.ExchangeLogs.Count total)</h2>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #e0e0e0;">
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Time</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Direction</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Method</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Endpoint</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Status</th>
+                        <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.ExchangeLogs)
+                    {
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px; border: 1px solid #ddd;">@log.Timestamp:O</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">@Model.GetDirectionBadge(log.Direction)</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;"><code>@log.Method</code></td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">@log.Endpoint</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                                <span style="background-color: @Model.GetStatusColor(log.HttpStatusCode); color: white; padding: 4px 8px; border-radius: 3px; display: inline-block;">
+                                    @log.HttpStatusCode
+                                </span>
+                            </td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                                <a href="@Url.Page("/Logs", new { connectionId = Model.Connection.Id, selectedLogId = log.Id })" 
+                                   style="color: #007bff; text-decoration: none; font-weight: bold;">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.SelectedLog != null)
+        {
+            <div style="margin: 20px 0; padding: 15px; border: 2px solid #007bff; background-color: #e7f3ff;">
+                <h2>Log Entry Details (ID: @Model.SelectedLog.Id)</h2>
+
+                <div style="margin: 15px 0; padding: 10px; background-color: white; border: 1px solid #ddd;">
+                    <strong>Metadata</strong>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; width: 20%;"><strong>Timestamp:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">@Model.SelectedLog.Timestamp:O</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Direction:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">@Model.GetDirectionBadge(Model.SelectedLog.Direction)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Method:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><code>@Model.SelectedLog.Method</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Endpoint:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><code>@Model.SelectedLog.Endpoint</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>HTTP Status:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">
+                                <span style="background-color: @Model.GetStatusColor(Model.SelectedLog.HttpStatusCode); color: white; padding: 4px 8px; border-radius: 3px; display: inline-block;">
+                                    @Model.SelectedLog.HttpStatusCode
+                                </span>
+                            </td>
+                        </tr>
+                        @if (!string.IsNullOrEmpty(Model.SelectedLog.ErrorMessage))
+                        {
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Error:</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd; color: #c82333;">@Model.SelectedLog.ErrorMessage</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+
+                <div style="margin: 15px 0; padding: 10px; background-color: white; border: 1px solid #ddd;">
+                    <strong>Request Payload</strong>
+                    @if (Model.SelectedLog.RequestPayload == null)
+                    {
+                        <p style="color: #666; margin: 10px 0;">(no request payload)</p>
+                    }
+                    else
+                    {
+                        <pre style="background-color: #f5f5f5; padding: 12px; border-radius: 3px; overflow-x: auto; font-size: 12px; line-height: 1.4; margin-top: 10px;">@Model.FormatJson(Model.SelectedLog.RequestPayload)</pre>
+                    }
+                </div>
+
+                <div style="margin: 15px 0; padding: 10px; background-color: white; border: 1px solid #ddd;">
+                    <strong>Response Payload</strong>
+                    @if (Model.SelectedLog.ResponsePayload == null)
+                    {
+                        <p style="color: #666; margin: 10px 0;">(no response payload)</p>
+                    }
+                    else
+                    {
+                        <pre style="background-color: #f5f5f5; padding: 12px; border-radius: 3px; overflow-x: auto; font-size: 12px; line-height: 1.4; margin-top: 10px;">@Model.FormatJson(Model.SelectedLog.ResponsePayload)</pre>
+                    }
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <a href="@Url.Page("/Logs", new { connectionId = Model.Connection.Id })" 
+                       style="display: inline-block; padding: 8px 16px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">
+                        ? Clear Selection
+                    </a>
+                </div>
+            </div>
+        }
+    }
+
+    <div style="margin: 20px 0; padding: 15px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <h2>Navigation</h2>
+        <p>
+            <a href="@Url.Page("/Dashboard", new { connectionId = Model.Connection.Id })" 
+               style="display: inline-block; margin: 5px; padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none;">
+                ? Dashboard
+            </a>
+            <a href="@Url.Page("/Handshake", new { connectionId = Model.Connection.Id })" 
+               style="display: inline-block; margin: 5px; padding: 8px 16px; background-color: #007bff; color: white; text-decoration: none;">
+                Handshake Control
+            </a>
+        </p>
+    </div>
+}
